@@ -1,0 +1,56 @@
+---
+title: "Box Sync"
+author: "Brian S Yandell"
+date: "September 7, 2016"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+### Learning Goals
+
+The goal of this exercise is to use Box and the [Box Sync](https://sites.box.com/sync4/) tool to share files. After completing a person will be able to
+
+* login to [UW-Madison Box](https://uwmadison.app.box.com)
+* download the [Box Sync](https://uwmadison.app.box.com/settings/sync) app to a laptop
+* sync the [DOQTL2 Data Group](https://uwmadison.app.box.com/files/0/f/11159715386/DOQTL2_Data_Club) folder to a laptop
+* read files from this synced folder
+* upload to the [DOQTL2 Data Group Upload folder](https://uwmadison.app.box.com/files/0/f/11219066452/Upload)
+* use SQLite via Firefox to examine [portal_mammals.sqlite](https://uwmadison.app.box.com/files/0/f/11159715386/1/f_94224979028)
+
+### Setup
+
+#### Box Account
+
+Open your browser (Firefox preferably for Data Group) and navigate to [box.com](https://box.com). Enter your UW login (`NetID@wisc.edu`) but do NOT enter a password. Box should redirect you to the UW-Madison Box account, where the UW Login page will appear. At this point, enter your NetID and Password for UW-Madison.
+
+You may not have any folders yet. Give the instructor your NetID and s/he can give you access to the [DOQTL2 Data Group](https://uwmadison.app.box.com/files/0/f/11159715386/DOQTL2_Data_Club) folder.
+
+#### Box Sync
+
+Got to [https://uwmadison.app.box.com/settings/sync](https://uwmadison.app.box.com/settings/sync) to get the lastest Box Sync. This site should be able to detect your laptop configuration and get you what you need. Follow instructions to install.
+
+### Using Box Sync to Sync a Folder
+
+There should be a `b` icon on your dashboard. If not, just use your Finder or the Windows File Folder. You should find an entry for `Box Sync`. Open it. It may be empty.
+
+To add folders to Box Sync, go to your Box account via the Browser. Enter the folder you want to sync, or go to its parent folder. Click on the `...` icon and select `Properties`, then `Sync to Computer`. You will be asked if you really want to `Sync Folder`. [You can later Unsync from Box or your laptop.]
+
+Note: in the `Sync to Computer` step, there is also a statement: `If you have not installed Box Sync, [download it](https://uwmadison.app.box.com/settings/sync).` If you click on `download it`, there are instructions to get Box Sync.
+
+### Using DOQTL Data Group Box folder
+
+The Box folder is set for users to be in `Viewer Upload` mode. You should be able to view the folder and download files, but not change any file or folder already there. There is an `Upload` folder, and I suggest for now that you place any file you want to upload into that folder. Go ahead and try it.
+
+### Access Box SQLite Database
+
+Use the Firefox SQLite app (Tools menu after you install it) to Connect to the copy of the `portal_mammals.sqlite` database. Run through some SQL commands on this database to verify that you can do it.
+
+#### Export CSV from SQLite Database
+
+Use the `Export Wizard` button on the Firefox SQLite app to download one of the tables from `portal_mammals.sqlite`. [If the `Export Wizard` button is not there, go to `Table` menu tab and click on `Export Table`.] Be sure to check the `First row contains column names` box. Note that when you export as CSV, it will export the whole table and ignore any SQL selecting and filtering you might have done.
+
+#### Modifying SQLite Database
+
+You should not be able to change the SQLite database in my folder, as you only have `Viewer Uploader` privileges. However, you CAN change SQLite databases in your own folder. This can be a blessing and/or a curse. We will talk later about how to manage SQLite databases using the R/dplyr package.
+
