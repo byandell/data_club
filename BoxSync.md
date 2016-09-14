@@ -20,6 +20,17 @@ The goal of this exercise is to use Box and the [Box Sync](https://sites.box.com
 
 ### Setup
 
+#### Help and Documentation
+
+As with any tool, it helps to know where to look for questions that arise. Here are some links at Box and UW-Madison:
+
+* [Box at UW-Madison](https://it.wisc.edu/services/box/)
+* [Box Knowledge Base at UW](https://kb.wisc.edu/box/)
+  + [Getting Started](https://kb.wisc.edu/box/page.php?id=33229) 
+  + [Clients and Syncing](https://kb.wisc.edu/box/page.php?id=33789)
+
+New users [Getting Started](https://kb.wisc.edu/box/page.php?id=33229) probably want to turn off [Notifications](https://community.box.com/t5/Account-Information/How-Do-I-Manage-Email-Notifications-From-Box/ta-p/23). See [Clients and Syncing](https://kb.wisc.edu/box/page.php?id=33789) for information on [Box Sync](https://community.box.com/t5/Box-Sync/Get-Started-with-Box-Sync/ta-p/86). Once logged in to [UW Box](https://uwmadison.app.box.com/), you can also learn more at [https://uwmadison.app.box.com/settings/sync](https://uwmadison.app.box.com/settings/sync).
+
 #### Box Account
 
 Open your browser (Firefox preferably for Data Group) and navigate to [box.com](https://box.com). Enter your UW login (`NetID@wisc.edu`) but do NOT enter a password. Box should redirect you to the UW-Madison Box account, where the UW Login page will appear. At this point, enter your NetID and Password for UW-Madison.
@@ -52,5 +63,13 @@ Use the `Export Wizard` button on the Firefox SQLite app to download one of the 
 
 #### Modifying SQLite Database
 
-You should not be able to change the SQLite database in my folder, as you only have `Viewer Uploader` privileges. However, you CAN change SQLite databases in your own folder. This can be a blessing and/or a curse. We will talk later about how to manage SQLite databases using the R/dplyr package.
+You should not be able to change the SQLite database in my folder, as it is locked. However, you CAN change SQLite databases in your own folder. This can be a blessing and/or a curse. 
+We will talk later about how to manage SQLite databases using the R/dplyr package.
+
+#### Box Permissions
+
+Typically, a user is invited to a Box folder with `Viewer Uploader` or `Editor` privileges. (See [UW-Madison Box Collaborator Permissions](https://kb.wisc.edu/box/page.php?id=37618) for details.)
+While `Editor` gives one more flexibility, including the ability to use `Box Sync` to syncronize a folder to laptop or desktop, it comes with added responsibility.
+That is, an `Editor` can modify or destroy material in Box, so be careful!
+
 
