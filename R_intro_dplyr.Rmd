@@ -1,8 +1,9 @@
 ---
-layout: topic
-title: Intro to R Adapted to dplyr
-author: Data Carpentry contributors
+title: "Intro to R Adapted to dplyr"
+author: "Data Carpentry contributors"
 minutes: 45
+output: pdf_document
+layout: topic
 ---
 
 ```{r knitr_options, echo=FALSE}
@@ -195,3 +196,30 @@ surveys_by_10 <- surveys %>%
   filter(row_number() %in% seq(10, nrow(surveys), by = 10))
 ```
 --->
+
+### More tally stuff
+
+The `dplyr` intro uses `tally` several times. If you look on the help page for `tally` you will find `count`. You will also find reference to `n` and `sum`. Here are several ways to do the same task. Why are there several ways? Who knows? But sometimes you want to do other things in tandem, and one of these might work best.
+
+```{r}
+surveys %>%
+  group_by(sex) %>%
+  tally
+```
+```{r}
+surveys %>%
+  count(sex)
+```
+
+```{r}
+surveys %>%
+  group_by(sex) %>%
+  summarize(count = n())
+```
+
+```{r}
+surveys %>%
+  group_by(sex) %>%
+  summarize(count = sum(!is.na(year)))
+```
+
