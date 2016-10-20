@@ -1,5 +1,19 @@
+---
+title: "Surveys GGplot"
+output:
+  html_document: default
+  html_notebook: default
+  pdf_document: default
+---
+
+```{r load_libraries, echo=FALSE, message=FALSE}
 library(ggplot2)
 library(dplyr)
+```
+
+### Clean surveys data.
+
+```{r clean_surveys}
 surveys <- read.csv("data/portal_data_joined.csv")
 surveys_complete <- surveys %>%
   filter(species_id != "", !is.na(weight)) %>%
@@ -15,20 +29,62 @@ frequent_species <-  species_counts %>%
 # filter out the less-frequent species
 surveys_complete <- surveys_complete %>%
   filter(species_id %in% frequent_species$species_id)
+```
 
+### Some plots
+
+Plot species `DM`
+
+```{r}
 ggplot(surveys_complete %>%
          filter(species_id == "DM"), 
        aes(x = weight, y = hindfoot_length)) + 
   geom_point(shape = 1)
+```
+
+Plot weight by hindfoot length
 
 
+```{r}
 surveys_plot <- ggplot(surveys_complete, 
                        aes(x = weight, 
                            y = hindfoot_length))
+```
 
-## http://docs.ggplot2.org/current/scale_brewer.html
+\pagebreak
+
+### R color brewer example
+
+* [colorbrewer web page](http://colorbrewer2.org)
+* [scale_brewer help
+page](http://docs.ggplot2.org/current/scale_brewer.html)
+
+Table of ColorBrewer palettes
+
+```{r}
 RColorBrewer::brewer.pal.info
+```
+
+\pagebreak
+
+#### Plot using ColorBrewer colors
+
+```{r}
 surveys_plot + 
   geom_point(alpha = 1, shape = 1, aes(color=genus)) +
   scale_color_brewer(type="qualitative", palette = "Paired") +
   scale_x_sqrt()
+```
+
+\pagebreak
+
+#### Same plot with no legend but added title.
+
+```{r}
+surveys_plot + 
+  geom_point(alpha = 1, shape = 1, aes(color=genus)) +
+  scale_color_brewer(type="qualitative", palette = "Paired") +
+  scale_x_sqrt() +
+  theme(legend.position = "none") +
+  ggtitle("weight by hindfoot length, color = genus")
+```

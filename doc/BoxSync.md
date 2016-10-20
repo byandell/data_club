@@ -41,6 +41,11 @@ You may not have any folders yet. Give the instructor your NetID and s/he can gi
 
 Got to [https://uwmadison.app.box.com/settings/sync](https://uwmadison.app.box.com/settings/sync) to get the lastest Box Sync. This site should be able to detect your laptop configuration and get you what you need. Follow instructions to install.
 
+Some things to know:
+
+* Box Sync only works for users in `Editor` mode. Users in this mode can actually change files in this folder.
+* Box Sync makes a copy of the folder and all its contents on your computer. This will take up space, so might affect whether or not you use it.
+
 ### Using Box Sync to Sync a Folder
 
 There should be a `b` icon on your dashboard. If not, just use your Finder or the Windows File Folder. You should find an entry for `Box Sync`. Open it. It may be empty.
@@ -49,9 +54,9 @@ To add folders to Box Sync, go to your Box account via the Browser. Enter the fo
 
 Note: in the `Sync to Computer` step, there is also a statement: `If you have not installed Box Sync, [download it](https://uwmadison.app.box.com/settings/sync).` If you click on `download it`, there are instructions to get Box Sync.
 
-### Using DOQTL Data Group Box folder
+### Using Data Group Box folder
 
-The Box folder is set for users to be in `Viewer Upload` mode. You should be able to view the folder and download files, but not change any file or folder already there. There is an `Upload` folder, and I suggest for now that you place any file you want to upload into that folder. Go ahead and try it.
+Users in `Viewer Upload` mode can view the folder and download files, but not change any file or folder already there. There is an `Upload` folder; please place any file you want to upload into that folder. Go ahead and try it.
 
 ### Access Box SQLite Database
 
@@ -64,7 +69,7 @@ Use the `Export Wizard` button on the Firefox SQLite app to download one of the 
 #### Modifying SQLite Database
 
 You should not be able to change the SQLite database in my folder, as it is locked. However, you CAN change SQLite databases in your own folder. This can be a blessing and/or a curse. 
-We will talk later about how to manage SQLite databases using the R/dplyr package.
+We will talk later about how to manage SQLite databases using the R/dplyr package. Typical use is most likely to copy the SQLite database from Box and use it locally.
 
 #### Box Permissions
 
