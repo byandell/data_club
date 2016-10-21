@@ -6,14 +6,14 @@ output:
 ---
 
 ```{r libraries, message=FALSE}
-library(readr)
 library(dplyr)
+library(tidyr)
 library(ggplot2)
 ```
 
 ### Learning Objectives
 
-* examine covariates on their own
+* examine how covariates reveal patterns in traits
 * plot relationships adjusting for covariates 
 * determine how covariates change interpretation of relationships
 
@@ -78,7 +78,27 @@ ggplot(surveys_dip,
 
 Make boxplots and density plots for `hindfoot_length`. How do these compare with the `weight` plots?
 
-<-- end challenge -->
+<!-- end challenge -->
+
+<!---
+## boxplots by species
+ggplot(surveys_dip,
+       aes(x = species, y = hindfoot_length)) +
+  geom_jitter(col="lightgrey") +
+  geom_boxplot() + 
+  coord_flip()
+
+## density
+ggplot(surveys_dip,
+       aes(x = hindfoot_length, col = species, )) +
+  geom_density()
+
+# density using facets.
+gplot(surveys_dip,
+       aes(x = hindfoot_length, col = species, )) +
+  geom_density() +
+  facet_grid(species~.)
+--->
 
 ## Plot two phenotypes adjusting for species
 
@@ -92,8 +112,7 @@ surveys_plot <- ggplot(surveys_dip,
 ```{r}
 surveys_plot + 
   geom_point(alpha = 1, shape = 1) +
-  scale_color_brewer(type="qualitative", palette = "Paired") +
-  scale_x_sqrt()
+  scale_color_brewer(type="qualitative", palette = "Paired")
 ```
 
 ### Add a smooth and straight line
@@ -102,18 +121,16 @@ surveys_plot +
 surveys_plot + 
   geom_point(alpha = 1, shape = 1) +
   scale_color_brewer(type="qualitative", palette = "Paired") +
-  scale_x_sqrt() +
   geom_smooth(se=FALSE, col="black") +
   geom_smooth(se=FALSE, col="red", method="lm")
 ```
 
-This is not very satisfying. The straight line misses key aspects of the relationship, and the curved line, while going through the data, does this without explicit regard to species. Now we allow separate lines by species. Since our `surveys_plot` object already identifies color with species, the change is very simple.
+This is not very satisfying. The straight line (which we saw in the previous lesson) misses key aspects of the relationship, and the curved line, while going through the data, does this without explicit regard to species. Now we allow separate lines by species. Since our `surveys_plot` object already identifies color with species, the change is very simple.
 
 ```{r}
 surveys_plot + 
   geom_point(alpha = 1, shape = 1) +
   scale_color_brewer(type="qualitative", palette = "Paired") +
-  scale_x_sqrt() +
   geom_smooth(se=FALSE, method="lm")
 ```
 
@@ -123,7 +140,6 @@ It might be easier to see this in separate facets.
 surveys_plot + 
   geom_point(alpha = 1, shape = 1) +
   scale_color_brewer(type="qualitative", palette = "Paired") +
-  scale_x_sqrt() +
   geom_smooth(se=FALSE, method="lm", col = "black") +
   facet_wrap(~species) +
   theme(legend.position="none")
@@ -131,21 +147,29 @@ surveys_plot +
 
 ### Adjusting correlation by covariate
 
-For males and females separately, the correlation is somewhat different.
+The correlation is differs across species:
 
 ```{r}
-surveys_dip %>%
+(cor_species <- surveys_dip %>%
   group_by(species) %>%
-  summarize(cor = cor(weight, hindfoot_length))
+  summarize(cor = cor(weight, hindfoot_length)))
 ```
 
 Compare these with the overall correlation
 
 ```{r}
-with(surveys_dip, cor(weight, hindfoot_length))
+with(surveys_dip, cor(sqrt(weight), hindfoot_length))
 ```
 
-Thus, most of the correlation between `weight` and `hindfoot_length` can be explained by `species`.
+#### Challenge
+
+Why do the species-specific and overall correlations differ so much?
+
+<!-- end challenge -->
+
+<!---
+Most of the correlation between `weight` and `hindfoot_length` can be explained by `species`.
+--->
 
 ### Adjusting group mean by other phenotype
 
@@ -215,6 +239,43 @@ When there are significant interactions, it is difficult to interpret the main e
 That is, interaction means the relationship is different for different levels of the covariate, and you cannot interpret the relationship averaged over those levels.
 
 Looking back at the plot, we see that for `merriami` species has a steeper slope.
+
+### Relationship of Correlation to Slope
+
+The plots above are a bit confusing for species `spectabilis`, when you notice that this species has the largest correlation of `weight` to `hindfoot_length`, `r (cor_species %>% filter(species == "spectabilis"))$cor`. The reason the slope seems off is that the relationship of slope to correlation is as follows:
+
+```{r eval=FALSE}
+slope = cor(weigth, hindfoot_length) * sd(hindfoot_length) / sd(weight)
+```
+
+```{r}
+surveys_dip %>%
+  group_by(species) %>%
+  summarize(weight_sd = sd(weight),
+            hf_length_sd = sd(hindfoot_length),
+            cor = cor(weight, hindfoot_length)) %>%
+  ungroup %>%
+  mutate(slope = cor * hf_length_sd / weight_sd) %>%
+  select(species,cor,slope,weight_sd,hf_length_sd)
+```
+
+Here is the correlation for species `spectabilis`:
+
+```{r}
+coef(lm(hindfoot_length ~ weight, 
+        surveys_dip %>%
+          filter(species == "spectabilis")))
+```
+
+The following is a much more advanced approach to get the slope and intercept using the `lm()` function with another function called `do()`:
+
+```{r}
+(coef_species <- surveys_dip %>%
+  group_by(species) %>%
+  do(data.frame(coef = coef(lm(hindfoot_length ~ weight, data=.)))) %>%
+  mutate(term = rep(c("intercept", "slope"), length.out = n())) %>%
+  spread(term, coef))
+```
 
 ### Recap
 

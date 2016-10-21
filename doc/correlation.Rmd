@@ -59,8 +59,7 @@ surveys_plot <- ggplot(surveys_dip,
 
 ```{r}
 surveys_plot + 
-  geom_point(alpha = 1, shape = 1) +
-  scale_x_sqrt()
+  geom_point(alpha = 1, shape = 1)
 ```
 
 ### Add a smooth line
@@ -68,12 +67,8 @@ surveys_plot +
 ```{r}
 surveys_plot + 
   geom_point(alpha = 1, shape = 1, col = "gray") +
-  scale_color_brewer(type="qualitative", palette = "Paired") +
-  scale_x_sqrt() +
   geom_smooth()
 ```
-
-Notice that the relationship is roughly linear for each species (fitable by straight lines).
 
 ### Correlation Coefficient
 
@@ -109,6 +104,26 @@ The challenge with using measures based on ranks is that we lose some power to d
 
 Here are several different ways to compute correlation, each with its own assumptions. They each give slightly different values. Clearly, there are many subtle issues here, and best to consult with a professional if you head down this path.
 
+#### Challenge
+
+Calculate the Spearman correlation, which is based on ranks. How does it compare to Pearson correlation? What type of plot would help illustrate Spearman correlation?
+Argue why Pearson correlation may be adequate.
+
+<!-- end challenge -->
+
+<!---
+## Pearson, Spearman, rank and Kendall correlation
+with(surveys_dip,
+     c(pearson  = cor(weight, hindfoot_length),
+       rank     = cor(rank(weight), log2(hindfoot_length)),
+       spearman = cor(weight, hindfoot_length, method = "spearman"),
+       kendall  = cor(weight, hindfoot_length, method = "kendall")))
+ggplot(surveys_dip, 
+       aes(x=rank(weight), y=rank(hindfoot_length))) +
+  geom_point() +
+  geom_smooth()
+--->
+
 #### Correlation Test
 
 ```{r}
@@ -117,24 +132,75 @@ with(surveys_dip, cor.test(weight, hindfoot_length))
 
 The significance of correlation depends on `df`, which is 2 less than sample size. In this case, the test is highly signficant. There is a confidence interval provided, which you will notice is typically not symmetric about the estimated correlation.
 
+#### Challenge
+
+What are the test statistic ($t$) significance ($p$-value) for this correlation?
+
+<!-- end challenge -->
+
+<!---
+tmp <- with(surveys_dip, 
+            cor.test(weight, hindfoot_length))
+tmp$p.value
+tmp$statistic
+--->
+
 #### Linear Model interpretation of Correlation
 
-An alternative test is to use the linear model function `lm()` to do the same thing. That is, `lm` tests the same linear relationship as does `cor.test`. 
-Put another way, correlation and linear regression are two perspectives on the same relationship.
+Correlation measures the association between two numeric variables, here `weight` and `hindfoot_length`. One of these variables can be viewed, at least formally, as the predictor and the other as the response. Here, we view `weight` as the predictor of `hindfoot_length`, which we can write in a formula as
+
+```{r eval=FALSE}
+hindfoot_length ~ weight
+```
+
+We say that we "regress `hindfoot_length` on `weight`". This is sometimes called "simple linear regression", because the right side of this formula can get a lot more complicated (in later lessons). We introduce this concept here to make the bridge to the next lesson on covariates, and to connect correlation to linear models.
+
+Simple linear regression is a special kind of "linear model". The linear model function `lm()` provides another tool to test correlation, with more flexibility than `cor.test()`. `lm` has more bells and whistles and `lm` can handle more complicated relationships.
+
+Put another way, correlation and linear regression are two perspectives on the same relationship. Here we fit a linear model
 
 ```{r}
 fit <- lm(hindfoot_length ~ weight, surveys_dip)
 summary(fit)
 ```
 
-While there is a lot of output, notice that the `Coefficients` table has a column for `t value`. The `t value` for `log2(WBC)` is identical with the `t` from `cor.test`. Both are `r round(summary(fit)$coefficients["weight","t value"], 2)`.
+#### Challenge
 
-We can go back to the plot and use a straight line instead of a smooth one:
+While there is a lot of output, notice that the `Coefficients` table has a column for `t value`. Verify that the `t value` for `weight` is identical with the `t` from the `cor.test`. What other terms agree between these to formal summaries?
+
+<!-- end challenge -->
+
+<!---
+round(summary(fit)$coefficients["weight","t value"], 2)
+--->
+
+### Plot with straight line
+
+We can go back to the plot and use a straight line instead of a smooth one.
+Formally, when we measure correlation or simple linear regression, this is the relationship we assume. What is wrong with this picture?
 
 ```{r}
 surveys_plot + 
   geom_point(alpha = 1, shape = 1) +
   scale_color_brewer(type="qualitative", palette = "Paired") +
-  scale_x_sqrt() +
   geom_smooth(method="lm")
 ```
+
+#### Challenge
+
+Earlier, we had used a `sqrt` transformation to adjust for skew in `weight`. Redo above plots and analysis with a `sqrt` transform.
+
+Hint: For plots, you can use `scale_x_sqrt()` to transform the x axis.
+
+<!-- end challenge -->
+
+<!---
+surveys_plot + 
+  geom_point(alpha = 1, shape = 1) +
+  scale_color_brewer(type="qualitative", palette = "Paired") +
+  geom_smooth(method="lm") +
+  scale_x_sqrt()
+with(surveys_dip, cor.test(sqrt(weight), hindfoot_length))
+fit_sqrt <- lm(hindfoot_length ~ sqrt(weight), surveys_dip)
+summary(fit_sqrt)
+--->
