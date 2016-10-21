@@ -5,137 +5,85 @@ output:
   html_notebook: default
 ---
 
-This project concerns a Diversity Outbred (DO) mouse population that you can read about at [https://github.com/rqtl/qtl2data/tree/master/DO_Gatti2014](https://github.com/rqtl/qtl2data/tree/master/DO_Gatti2014). Here we look at how some phenotypes are correlated with each other.
-
 ```{r libraries, message=FALSE}
-library(readr)
 library(dplyr)
 library(ggplot2)
 ```
 
 ### Learning Objectives
 
-Likely split into two lessons, with first on setup and thinking about experiment, and second on correlation.
-
-* access open source data 
-* find out where data come from
-* imagine possible issues with experiment
 * report on data sources and challenges
 * plot and summarize single phenotype
 * relate two phenotypes using correlation and regression
+* imagine possible issues with experiment
 
-### Where do the data come from?
+### Read data
 
-We are sometimes sloppy and call a set of individuals being studied the "population", when in fact they are a "sample" from a larger population.
+Here we read in data and reduce to species with counts at least 10.
 
-### Read Phenotypes
-
-```{r pheno}
-pheno <- read_csv("https://raw.githubusercontent.com/rqtl/qtl2data/master/DO_Gatti2014/do_pheno.csv", 
-                  comment = "#")
+```{r read}
+surveys <- read.csv("../data/portal_data_joined.csv")
+## Remove missing data.
+surveys_complete <- surveys %>%
+  filter(species_id != "", !is.na(weight)) %>%
+  filter(!is.na(hindfoot_length), sex != "")
+# count records per species
+species_counts <- surveys_complete %>%
+  group_by(species_id) %>%
+  tally
+# get names of the species with counts >= 10
+frequent_species <-  species_counts %>%
+  filter(n >= 10) %>%
+  select(species_id)
+# filter out the less-frequent species
+surveys_complete <- surveys_complete %>%
+  filter(species_id %in% frequent_species$species_id)
 ```
-#### Challenge
 
-Using what you know about R, characterize these data. How many samples? How many phenotypes? Any missing data?
-
-<!-- end challenge -->
-
-### Summarize data
+Now focus on one genus, `Dipodomys`.
 
 ```{r}
-pheno %>%
-  summarize_all(mean)
+surveys_dip <- surveys_complete %>%
+  filter(genus == "Dipodomys")
 ```
-
-```{r}
-pheno %>%
-  summarize_at(vars(WBC,NEUT), funs(mean,min,max))
-```
-
-Here is a 6-value summary for one phenotype. Notice the use of `with()` to do this for a column within `pheno`.
-
-```{r}
-with(pheno, summary(WBC))
-```
-
-### Examine one phenotype
-
-It is always a good idea to start out by plotting the data. We start by plotting each phenotype on its own.
-
-```{r}
-ggplot(pheno, aes(x=WBC)) +
-  geom_density() +
-  geom_rug()
-```
-
-These data look "skewed". That is, there is a "tail" to the right, and data are not "symmetric" around the peak. Looking to the left side, values are pretty compact.
-
-#### Challenge
-
-Transform `WBC` to see 
-
-```{r}
-ggplot(pheno, aes(x=log2(WBC))) +
-  geom_density() +
-  geom_rug()
-```
-
-<!-- end challenge -->
-
-## Examine pair of phenotypes
-
-When we examine a pair of phenotypes, we often call this "correlation" or "association". Here is a nice overview article: [Points of Significance: Association, correlation and causation (Nature Medicine 2015)](http://www.nature.com/nmeth/journal/v12/n10/full/nmeth.3587.html).
 
 ### Plot two phenotypes
 
 Now we examine the two phenotypes against each other
 
 ```{r}
-ggplot(pheno, aes(x=WBC, y=NEUT)) +
-  geom_point()
+surveys_plot <- ggplot(surveys_dip, 
+                       aes(x = weight, 
+                           y = hindfoot_length))
 ```
 
-There appears to be skew for both traits. Try `log2` transform
-
 ```{r}
-ggplot(pheno, aes(x=log2(WBC), y=log2(NEUT))) +
-  geom_point()
-```
-
-Why not use `log10` instead of `log2`? Feel free to do so, as they are directly related. As you see below, they are directly related to each other.
-
-```{r}
-ggplot(pheno, aes(x=log2(WBC), y=log10(WBC))) +
-  geom_point()
+surveys_plot + 
+  geom_point(alpha = 1, shape = 1) +
+  scale_x_sqrt()
 ```
 
 ### Add a smooth line
 
 ```{r}
-ggplot(pheno, aes(x=log2(WBC), y=log2(NEUT))) +
-  geom_point() +
+surveys_plot + 
+  geom_point(alpha = 1, shape = 1, col = "gray") +
+  scale_color_brewer(type="qualitative", palette = "Paired") +
+  scale_x_sqrt() +
   geom_smooth()
 ```
 
-Notice that the relationship is roughly linear (fitable by a straight line through most of the data).
-
-```{r}
-ggplot(pheno, aes(x=WBC, y=NEUT)) +
-  geom_point() +
-  geom_smooth()
-```
-
-Note here that the relationship for the raw data is roughly linear, but there are few points in the upper right, so that the relationship in that region is less certain, reflected in the gray band around the blue line.
+Notice that the relationship is roughly linear for each species (fitable by straight lines).
 
 ### Correlation Coefficient
 
 In practice we may have many phenotypes to examine, and it is useful to have a summary of how each pair of phenotypes are related. This is called correlation, computed using the `cor()` function. Look at the help page to learn about use.
 
 ```{r}
-with(pheno, cor(WBC, NEUT))
+with(surveys_dip, cor(weight, hindfoot_length))
 ```
 
-Just having one number is somewhat limited. In this case, there is a positive correlation (`r round(with(pheno, cor(WBC, NEUT)), 2)`). But how do we interpret it?
+Just having one number is somewhat limited. In this case, there is a positive correlation (`r round(with(surveys_dip, cor(weight, hindfoot_length)), 2)`). But how do we interpret it?
 The introductory book [_Statisticss_ by Freedman, Pisani and Purvis]() has a nice intrepretation, which is partially presented at [this website](http://www.analytictech.com/mb313/correlat.htm). Basically, if you look at the plot and see an increasing relationship, the correlation is roughly
 
 ```
@@ -150,40 +98,24 @@ cor = -(1 - width / length)
 
 Thus you can get a rough idea of correlation with your eye, and over time build up an intuition of how strong correlation is in different settings.
 
-#### Correlation as Estimate of Relationship
+#### Which correlation?
 
-Correlation gives a sense of the relationship, but it depends on the sample size. Wth more data, a correlation coefficient is better estimated. The idea is that there is some relationship between two phenotypes, which we can estimate in terms of this correlation coefficient. With more data, we get a better estimate.
+Correlation gives a sense of the relationship, but it depends on the sample size. With more data, a correlation coefficient is better estimated. The idea is that there is some relationship between two phenotypes, which we can estimate in terms of this correlation coefficient. With more data, we get a better estimate.
 
 There are a variety of approaches to measuring correlation. What is generally done is to use the standard, or Pearson, correlation unless there are strong reasons to doubt a linear relationship. In that case the options are to transform the data (as we did above with `log2`) or use an approach that is less sensitive to linearity.
 
-The non-linear approach, an example of non-parametric approaches, measures the degree of monotonic relationship by replacing the data with its ranks. We can visualize this in a plot using the `rank()` function.
+The non-linear approach, an example of non-parametric approaches, measures the degree of monotonic relationship by replacing the data with its ranks. 
+The challenge with using measures based on ranks is that we lose some power to detect relationship by making fewer assumptions. Note also that if two phenotypes have the same rank order, then their Spearman correlation is 1, although their Pearson correlation might be somewhat less.
 
-```{r}
-ggplot(pheno, aes(x=rank(WBC), y=rank(NEUT))) +
-  geom_point() +
-  geom_smooth()
-```
-
-The challenge with using measures based on ranks is that we lose some power to detect relationship by making fewer assumptions.
-
-Here are five different ways to compute correlation, each with its own assumptions. The last three are rank-based. They each give slightly different values. Clearly, there are many subtle issues here, and best to consult with a professional if you head down this path.
-
-```{r}
-with(pheno,
-     c(pearson  = cor(WBC, NEUT),
-       log2     = cor(log2(WBC), log2(NEUT)),
-       rank     = cor(rank(WBC), log2(NEUT)),
-       spearman = cor(WBC, NEUT, method = "spearman"),
-       kendall  = cor(WBC, NEUT, method = "kendall")))
-```
+Here are several different ways to compute correlation, each with its own assumptions. They each give slightly different values. Clearly, there are many subtle issues here, and best to consult with a professional if you head down this path.
 
 #### Correlation Test
 
-Here we focus on the `log2` transformation and conduct a formal test of correlation.
-
 ```{r}
-with(pheno, cor.test(log2(WBC), log2(NEUT)))
+with(surveys_dip, cor.test(weight, hindfoot_length))
 ```
+
+The significance of correlation depends on `df`, which is 2 less than sample size. In this case, the test is highly signficant. There is a confidence interval provided, which you will notice is typically not symmetric about the estimated correlation.
 
 #### Linear Model interpretation of Correlation
 
@@ -191,16 +123,18 @@ An alternative test is to use the linear model function `lm()` to do the same th
 Put another way, correlation and linear regression are two perspectives on the same relationship.
 
 ```{r}
-fit <- lm(log2(NEUT) ~ log2(WBC), pheno)
+fit <- lm(hindfoot_length ~ weight, surveys_dip)
 summary(fit)
 ```
 
-While there is a lot of output, notice that the `Coefficients` table has a column for `t value`. The `t value` for `log2(WBC)` is identical with the `t` from `cor.test`.
+While there is a lot of output, notice that the `Coefficients` table has a column for `t value`. The `t value` for `log2(WBC)` is identical with the `t` from `cor.test`. Both are `r round(summary(fit)$coefficients["weight","t value"], 2)`.
 
 We can go back to the plot and use a straight line instead of a smooth one:
 
 ```{r}
-ggplot(pheno, aes(x=log2(WBC), y=log2(NEUT))) +
-  geom_point() +
-  geom_smooth(method = "lm")
+surveys_plot + 
+  geom_point(alpha = 1, shape = 1) +
+  scale_color_brewer(type="qualitative", palette = "Paired") +
+  scale_x_sqrt() +
+  geom_smooth(method="lm")
 ```

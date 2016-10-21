@@ -15,6 +15,7 @@ library(dplyr)
 
 ```{r clean_surveys}
 surveys <- read.csv("data/portal_data_joined.csv")
+## Remove missing data.
 surveys_complete <- surveys %>%
   filter(species_id != "", !is.na(weight)) %>%
   filter(!is.na(hindfoot_length), sex != "")
