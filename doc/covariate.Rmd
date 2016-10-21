@@ -1,0 +1,181 @@
+---
+title: ""
+output: html_notebook
+---
+
+## 
+
+This project concerns a Diversity Outbred (DO) mouse population that you can read about at [https://github.com/rqtl/qtl2data/tree/master/DO_Gatti2014](https://github.com/rqtl/qtl2data/tree/master/DO_Gatti2014). Here we look at how some phenotypes are correlated with each other.
+
+```{r libraries, message=FALSE}
+library(readr)
+library(dplyr)
+library(ggplot2)
+```
+
+### Learning Objectives
+
+* examine covariates on their own
+* plot relationships adjusting for covariates 
+* determine how covariates change interpretation of relationships
+
+### Read Phenotypes
+
+```{r pheno}
+pheno <- read_csv("https://raw.githubusercontent.com/rqtl/qtl2data/master/DO_Gatti2014/do_pheno.csv", 
+                  comment = "#")
+```
+
+### Read Covariates
+
+There are other traits measured on this sample. 
+
+```{r covar}
+covar <- read_csv("https://raw.githubusercontent.com/rqtl/qtl2data/master/DO_Gatti2014/do_covar.csv", 
+                  comment = "#")
+```
+
+### Properties of Covariates
+
+```{r}
+str(covar)
+```
+
+```{r}
+covar
+```
+
+Note here that date is in one column. Refer to [data carpentry lesson on dates as data](http://www.datacarpentry.org/spreadsheet-ecology-lesson/03-dates-as-data.html).
+
+#### Challenge
+
+Create a table or tables to characterize `Sex`, `Batch` and `ngen`.
+
+### Relate Sex to a Phenotype
+
+```{r}
+pheno_covar <- full_join(pheno, covar)
+```
+
+```{r}
+ggplot(pheno_covar, aes(x=Sex,y=log2(WBC))) +
+  geom_boxplot()
+```
+
+Sometimes it is useful to put boxplots on their side.
+
+```{r}
+ggplot(pheno_covar, aes(x=Sex,y=log2(WBC))) +
+  geom_boxplot() + coord_flip()
+```
+
+We can also look at the density plots by sex.
+
+```{r}
+ggplot(pheno_covar, aes(x=log2(WBC), col=Sex)) +
+  geom_density() +
+  geom_rug()
+```
+
+Sometimes it is easier to see patterns by using facets.
+
+```{r}
+ggplot(pheno_covar, aes(x=log2(WBC))) +
+  geom_density() +
+  geom_rug() +
+  facet_grid(Sex~.)
+```
+
+### Plot two phenotypes with covariate
+
+```{r}
+ggplot(pheno_covar, aes(x=log2(WBC), y=log2(NEUT), col=Sex)) +
+  geom_point() +
+  geom_smooth()
+```
+
+Again, facets and rugs can help git a fuller picture. Notice how making the smooth line "black" helps it stand out.
+
+```{r}
+ggplot(pheno_covar, aes(x=log2(WBC), y=log2(NEUT), col=Sex)) +
+  geom_point() +
+  geom_smooth(col="black") +
+  facet_wrap(~Sex) + 
+  geom_rug()
+```
+
+### Adjusting correlation by covariate
+
+Here is the correlation. Notice the use of with.
+
+```{r}
+with(pheno, cor(log2(WBC), log2(NEUT)))
+```
+
+For males and females separately, the correlation is somewhat different.
+
+```{r}
+pheno_covar %>%
+  group_by(Sex) %>%
+  summarize(cor = cor(log2(WBC), log2(NEUT)))
+```
+
+### Adjusting group mean by other phenotype
+
+We can turn this around and ask what is the mean for `log2(WBC)` by `Sex`.
+
+```{r}
+(pheno_mean <- pheno_covar %>%
+  mutate(WBC = log2(WBC),
+         NEUT = log2(NEUT)) %>%
+  group_by(Sex) %>%
+  summarize_at(vars(WBC, NEUT), mean))
+```
+
+We can add these to a plot with straight lines to verify that the regression lines go through the means
+
+```{r}
+ggplot(pheno_covar, aes(x=log2(WBC), y=log2(NEUT), col=Sex)) +
+  geom_point() +
+  geom_smooth(method="lm", col="black") +
+  geom_point(data = pheno_mean,
+             aes(x=WBC, y=NEUT),
+             size = 4, col = "black", shape = 1) +
+  facet_wrap(~Sex)
+```
+
+### Linear Model Fits with additive covariate
+
+```{r}
+fit <- lm(log2(NEUT) ~ log2(WBC), pheno_covar)
+summary(fit)
+```
+
+```{r}
+fit_sex <- lm(log2(NEUT) ~ Sex + log2(WBC), pheno_covar)
+summary(fit_sex)
+```
+
+Notice that the `t value` for `log2(WBC)` changes slightly
+
+### Linear Model with interacting covariate
+
+Sometimes the relationship between two phenotypes shifts with level of a covarate. For instance, males and females have different correlations, and we want to account for that in our linear model. We do that by replacing the plus (`+`) with an asterisk (`*`).
+
+```{r}
+fit_sexint <- lm(log2(NEUT) ~ Sex * log2(WBC), pheno_covar)
+summary(fit_sexint)
+```
+
+In this case, the interaction term, `SexM:log2(WBC)`, is not significant.
+When there are significant interactions, it is difficult to interpret the main effects. It is usually best in that situation to report the significant interaction and then evaluate each level of the covariate (each sex in this case) separately.
+That is, interaction means the relationship is different for different levels of the covariate, and you cannot interpret the relationship averaged over those levels.
+
+**Need example to show this well**.
+
+An equivalent way to set this up is to keep the `+` form and add an explicit interaction term using the `:`.
+
+```{r}
+fit_sexint <- lm(log2(NEUT) ~ Sex + log2(WBC) + Sex:log2(WBC), pheno_covar)
+summary(fit_sexint)
+```
