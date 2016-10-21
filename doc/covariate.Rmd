@@ -248,6 +248,8 @@ The plots above are a bit confusing for species `spectabilis`, when you notice t
 slope(hf ~ w) = cor(w, hf) * sd(hf) / sd(w)
 ```
 
+Here is the calculation done separately by species.
+
 ```{r}
 surveys_dip %>%
   group_by(species) %>%
@@ -259,7 +261,7 @@ surveys_dip %>%
   select(species,cor,slope,weight_sd,hf_length_sd)
 ```
 
-Here is the correlation for species `spectabilis`:
+Here are the intercept and slope for species `spectabilis`.
 
 ```{r}
 coef(lm(hindfoot_length ~ weight, 
@@ -276,6 +278,16 @@ The following is a much more advanced approach to get the slope and intercept us
   mutate(term = rep(c("intercept", "slope"), length.out = n())) %>%
   spread(term, coef))
 ```
+
+#### Challenge
+
+Now that you have the numbers, explain the paradox between correlations and slopes, particularly for `spectabilis`.
+
+<!-- end challenge -->
+
+<!---
+Interpret table with correlations, slopes and SDs above.
+--->
 
 ### Recap
 
