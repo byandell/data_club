@@ -1,0 +1,94 @@
+
+vsOptn> nodes <- data.frame(id = 1:15, label = paste("Label", 1:15),
+vsOptn+  group = sample(LETTERS[1:3], 15, replace = TRUE))
+
+vsOptn> edges <- data.frame(from = trunc(runif(15)*(15-1))+1,
+vsOptn+  to = trunc(runif(15)*(15-1))+1)
+
+vsOptn> ###################  
+vsOptn> # highlight nearest
+vsOptn> ###################
+vsOptn> 
+vsOptn> visNetwork(nodes, edges) %>% visOptions(highlightNearest = TRUE)
+
+vsOptn> visNetwork(nodes, edges) %>% visOptions(highlightNearest = list(enabled = TRUE, degree = 2))
+
+vsOptn> # also when hover a node ?
+vsOptn> visNetwork(nodes, edges) %>% visOptions(highlightNearest = list(enabled = TRUE, hover = TRUE))
+
+vsOptn> # Using hierarchical information
+vsOptn> nodes = data.frame(id = 1:6, level = c(1, 2, 3, 3, 4, 2))
+
+vsOptn> edges = data.frame(from = c(1, 2, 2, 4, 6), to = c(2, 3, 4, 5, 4))
+
+vsOptn> visNetwork(nodes, edges) %>% visHierarchicalLayout() %>% visEdges(arrows = "to") %>% 
+vsOptn+  visOptions(highlightNearest = list(enabled = TRUE, algorithm = "hierarchical"))
+
+vsOptn> visNetwork(nodes, edges) %>% visHierarchicalLayout() %>% visEdges(arrows = "to") %>% 
+vsOptn+  visOptions(highlightNearest = list(enabled = TRUE, algorithm = "hierarchical", 
+vsOptn+    degree = list(from = 0, to = 2)))
+
+vsOptn> ##########################
+vsOptn> # nodesIdSelection
+vsOptn> ##########################
+vsOptn> 
+vsOptn> visNetwork(nodes, edges) %>% 
+vsOptn+  visOptions(highlightNearest = TRUE, nodesIdSelection = TRUE)
+
+vsOptn> # add a default selected node ?
+vsOptn> visNetwork(nodes, edges) %>% 
+vsOptn+  visOptions(highlightNearest = TRUE, 
+vsOptn+  nodesIdSelection = list(enabled = TRUE, selected = "1"))
+
+vsOptn> # subset on id values & don't use labels ?
+vsOptn> visNetwork(nodes, edges) %>% 
+vsOptn+  visOptions(highlightNearest = TRUE, 
+vsOptn+  nodesIdSelection = list(enabled = TRUE, 
+vsOptn+    selected = "2", values = c(2:10), useLabels = F))
+
+vsOptn> # some style
+vsOptn> visNetwork(nodes, edges) %>% 
+vsOptn+  visOptions(highlightNearest = TRUE, 
+vsOptn+  nodesIdSelection = list(enabled = TRUE, style = 'width: 200px; height: 26px;
+vsOptn+    background: #f8f8f8;
+vsOptn+    color: darkblue;
+vsOptn+    border:none;
+vsOptn+    outline:none;'))   
+
+vsOptn> ##########################
+vsOptn> # selectedBy
+vsOptn> ##########################
+vsOptn> 
+vsOptn> visNetwork(nodes, edges) %>% 
+vsOptn+  visOptions(selectedBy = "group")
+
+vsOptn> # add a default value ?
+vsOptn> visNetwork(nodes, edges) %>% 
+vsOptn+  visOptions(selectedBy = list(variable = "group", selected = "A"))
+
+vsOptn> # subset on values ?
+vsOptn> visNetwork(nodes, edges) %>% 
+vsOptn+  visOptions(selectedBy = list(variable = "group", 
+vsOptn+    selected = "C",
+vsOptn+    values = c("A", "C")))
+
+vsOptn> # add some style
+vsOptn> visNetwork(nodes, edges) %>% 
+vsOptn+  visOptions(selectedBy = list(variable = "group", style = 'width: 200px; height: 26px;
+vsOptn+    background: #f8f8f8;
+vsOptn+    color: darkblue;
+vsOptn+    border:none;
+vsOptn+    outline:none;'))
+
+vsOptn> # can also be on new column
+vsOptn> nodes$sample <- sample(c("sample 1", "sample 2"), nrow(nodes), replace = TRUE)
+
+vsOptn> visNetwork(nodes, edges) %>% 
+vsOptn+  visOptions(selectedBy = "sample")
+
+vsOptn> # and with multiple groups ?
+vsOptn> nodes$group <- sample(c("group 1", "group 2", "group 1, group 2, group 3"), 
+vsOptn+  nrow(nodes), replace = TRUE)
+
+vsOptn> visNetwork(nodes, edges) %>% 
+vsOptn+  visOptions(selectedBy = list(variable = "group", multiple = TRUE))
