@@ -9,5 +9,6 @@
 *.Rproj
 .DS_Store
 *.docx
-networks/Pointer*
+networks/Polnet*.R
 *.png
+*.zip
