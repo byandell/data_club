@@ -5,7 +5,7 @@ output:
   html_notebook: default
 ---
 
-This project concerns a Diversity Outbred (DO) mouse population that you can read about at [https://github.com/rqtl/qtl2data/tree/master/DO_Gatti2014](https://github.com/rqtl/qtl2data/tree/master/DO_Gatti2014). Here we look at how some phenotypes are correlated with each other.
+This project concerns a Diversity Outbred (DO) mouse population that you can read about at [https://github.com/rqtl/qtl2data/tree/master/DO_Gatti2014](https://github.com/rqtl/qtl2data/tree/master/DO_Gatti2014), or at the main site [http://churchill-lab.jax.org/website/GattiDOQTL](http://churchill-lab.jax.org/website/GattiDOQTL). Here we look at how some phenotypes are correlated with each other.
 
 ```{r libraries, message=FALSE}
 library(readr)
