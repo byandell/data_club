@@ -47,9 +47,40 @@ surveys_dip <- surveys_complete %>%
   filter(genus == "Dipodomys")
 ```
 
+## Correlation across species in genus
+
+Here we expand from species to genus and look at correlation, first by showing a scatterplot.
+
+```{r}
+surveys_plot <- ggplot(surveys_dip, 
+                       aes(x = weight, 
+                           y = hindfoot_length))
+```
+
+```{r}
+surveys_plot + 
+  geom_point(alpha = 1, shape = 1)
+```
+
+Add a straight line does not seem to capture the relationship.
+
+```{r}
+surveys_plot + 
+  geom_point(alpha = 1, shape = 1, col = "gray") +
+  geom_smooth(method = "lm")
+```
+
+Adding a smooth line does a better job, but is this what we really want?
+
+```{r}
+surveys_plot + 
+  geom_point(alpha = 1, shape = 1, col = "gray") +
+  geom_smooth()
+```
+
 ### Relate Species to a Phenotype
 
-The previous correlation study had a disturbing pattern that the data seemed to be from more than one group, which might be found with species. Here we examine one phenotype at a time with species, showing boxplots and densities.
+The above plot has a disturbing pattern that the data seem to be from more than one group, which might be found with species in the genus. Here we examine one phenotype at a time with species, showing boxplots and densities.
 
 ```{r}
 ggplot(surveys_dip,
@@ -112,7 +143,7 @@ surveys_plot <- ggplot(surveys_dip,
 ```{r}
 surveys_plot + 
   geom_point(alpha = 1, shape = 1) +
-  scale_color_brewer(type="qualitative", palette = "Paired")
+  scale_color_brewer(type="qualitative", palette = "Dark2")
 ```
 
 ### Add a smooth and straight line
@@ -120,7 +151,7 @@ surveys_plot +
 ```{r}
 surveys_plot + 
   geom_point(alpha = 1, shape = 1) +
-  scale_color_brewer(type="qualitative", palette = "Paired") +
+  scale_color_brewer(type="qualitative", palette = "Dark2") +
   geom_smooth(se=FALSE, col="black") +
   geom_smooth(se=FALSE, col="red", method="lm")
 ```
@@ -129,8 +160,8 @@ This is not very satisfying. The straight line (which we saw in the previous les
 
 ```{r}
 surveys_plot + 
-  geom_point(alpha = 1, shape = 1) +
-  scale_color_brewer(type="qualitative", palette = "Paired") +
+  geom_point(alpha = 0.2, shape = 1) +
+  scale_color_brewer(type="qualitative", palette = "Dark2") +
   geom_smooth(se=FALSE, method="lm")
 ```
 
@@ -139,7 +170,7 @@ It might be easier to see this in separate facets.
 ```{r}
 surveys_plot + 
   geom_point(alpha = 1, shape = 1) +
-  scale_color_brewer(type="qualitative", palette = "Paired") +
+  scale_color_brewer(type="qualitative", palette = "Dark2") +
   geom_smooth(se=FALSE, method="lm", col = "black") +
   facet_wrap(~species) +
   theme(legend.position="none")
@@ -186,7 +217,7 @@ We can add these to a plot with straight lines to verify that the regression lin
 ```{r}
 ggplot(surveys_dip, aes(x=weight, y=hindfoot_length, col=species)) +
   geom_point(alpha = 1, shape = 1) +
-  scale_color_brewer(type="qualitative", palette = "Paired") +
+  scale_color_brewer(type="qualitative", palette = "Dark2") +
   geom_smooth(method="lm", col="black") +
   geom_point(data = surveys_mean,
              aes(x=weight, y=hindfoot_length),

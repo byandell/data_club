@@ -99,21 +99,21 @@ slope <- SDs$hindfoot_length / SDs$weight
 intercept <- means$hindfoot_length - means$weight * slope
 ```
 
-Here is the SD line plotted over the scatterplot of data. A red circle is added at the mean of `weight` and `hindfoot_length`, and a rectangle extending out 2 SDs in each direction is shown in blue. The data points are made a bit smaller and grayer to deempathize them.
+Here is the SD line plotted over the scatterplot of data. A circle is added at the mean of `weight` and `hindfoot_length`, and a rectangle extends out 2 SDs in each direction. The data points are made a bit smaller and grayer to deempathize them.
 
 ```{r}
-surveys_plot + 
-  geom_point(alpha = 1, size = 0.5, shape = 1, col = "darkgray") +
-  geom_abline(intercept=intercept, slope=slope,
-              col="green", lwd=1) +
-  geom_point(aes(x = means$weight,
-                 y = means$hindfoot_length),
-             size = 4, col = "red", shape = 1) +
+surveys_plot +
   geom_rect(aes(xmin = means$weight - 2 * SDs$weight,
                 xmax = means$weight + 2 * SDs$weight,
                 ymin = means$hindfoot_length - 2 * SDs$hindfoot_length,
                 ymax = means$hindfoot_length + 2 * SDs$hindfoot_length),
-                alpha = 0, col="blue")
+                alpha = 0, col="black") + 
+  geom_point(alpha = 1, size = 0.5, shape = 1, col = "darkgray") +
+  geom_abline(intercept=intercept, slope=slope,
+              col="black", lwd=1) +
+  geom_point(aes(x = means$weight,
+                 y = means$hindfoot_length),
+             size = 4, col = "black", shape = 1)
 ```
 
 
@@ -230,6 +230,24 @@ While there is a lot of output, notice that the `Coefficients` table has a colum
 round(summary(fit)$coefficients["weight","t value"], 2)
 --->
 
+#### Challenge
+
+Earlier, we had used a `sqrt` transformation to adjust for skew in `weight`. Redo above plots and analysis with a `sqrt` transform.
+
+Hint: For plots, you can use `scale_x_sqrt()` to transform the x axis.
+
+<!-- end challenge -->
+
+<!---
+surveys_plot + 
+  geom_point(alpha = 1, shape = 1) +
+  scale_color_brewer(type="qualitative", palette = "Paired") +
+  geom_smooth(method="lm") +
+  scale_x_sqrt()
+with(surveys_dip, cor.test(sqrt(weight), hindfoot_length))
+fit_sqrt <- lm(hindfoot_length ~ sqrt(weight), surveys_dip)
+summary(fit_sqrt)
+--->
 ### Further Reading
 
 The interested reader might look at the chapters on [Correlation](http://www.stat.berkeley.edu/~stark/SticiGui/Text/correlation.htm) and [Regression](http://www.stat.berkeley.edu/~stark/SticiGui/Text/regression.htm) by [Philip Stark](http://www.stat.berkeley.edu/~stark/).
