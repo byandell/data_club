@@ -122,15 +122,15 @@ surveys_plot +
 These data have a positive correlation (`r round(with(surveys_dip_spec, cor(weight, hindfoot_length)), 2)`). But how do we interpret it?
 Basically, the tighter the data are around the SD line, the higher (in absolute value) is the correlation.
 
-The introductory book [_Statisticss_ by Freedman, Pisani and Purvis]() has a nice intrepretation, which is partially presented at [this website](http://www.analytictech.com/mb313/correlat.htm). Philip Stark's [Regression](http://www.stat.berkeley.edu/~stark/SticiGui/Text/regression.htm) chapter has a nice interactive tool where you can vary the sample size and correlation to develop some intuition. 
+The introductory book [_Statisticss_ by Freedman, Pisani and Purvis]() has a nice intrepretation, which is partially presented at [this website](http://www.analytictech.com/mb313/correlat.htm). 
 
-If your scatterplot (or the blue rectangle defined by SDs) is roughly square, the correlation is roughly
+If your scatterplot (or the rectangle defined by SDs) is roughly square, the correlation is roughly
 
 ```
 cor = 1 - width / length
 ```
 
-with `length` being the length along the green line`width` being the distance out perpendicular to the green line of the blob of data.
+with `length` being the length along the green line`width` being the distance out perpendicular to the green line of the blob of data. That is, the higher the correlation, the closer points are to the SD line.
 If the relationship is decreasing, the correlation is the opposite. 
 
 ```
@@ -139,11 +139,13 @@ cor = -(1 - width / length)
 
 Thus you can get a rough idea of correlation with your eye, and over time build up an intuition of how strong correlation is in different settings.
 
-```{r}
-surveys_complete %>% summarize_at(vars(hindfoot_length,weight), sd)
-```
+#### Challenge
 
-#### Which correlation?
+Visit Philip Stark's [Regression](http://www.stat.berkeley.edu/~stark/SticiGui/Text/regression.htm) chapter and use the interactive SD line tool (Figure 9-1) to gain some "intuition" about correlation. Vary the sample size and correlation. Try negative correlation.
+
+<!-- end challenge -->
+
+### Which correlation?
 
 Correlation gives a sense of the relationship, but it depends on the sample size. With more data, a correlation coefficient is better estimated. The idea is that there is some relationship between two phenotypes, which we can estimate in terms of this correlation coefficient. With more data, we get a better estimate.
 

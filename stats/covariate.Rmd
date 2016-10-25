@@ -276,7 +276,7 @@ Looking back at the plot, we see that for `merriami` species has a steeper slope
 The plots above are a bit confusing for species `spectabilis`, when you notice that this species has the largest correlation of `weight` to `hindfoot_length`, `r (cor_species %>% filter(species == "spectabilis"))$cor`. The reason the slope seems off is that the relationship of slope to correlation is as follows:
 
 ```{r eval=FALSE}
-slope(hf ~ w) = cor(w, hf) * sd(hf) / sd(w)
+slope(hf ~ wt) = cor(wt, hf) * sd(hf) / sd(wt)
 ```
 
 Here is the calculation done separately by species.
