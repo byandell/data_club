@@ -67,6 +67,13 @@ surveys_plot +
   geom_point(alpha = 1, shape = 1)
 ```
 
+```{r}
+ggplot(surveys_dip_spec,
+       aes(x = rank(weight),
+           y = rank(hindfoot_length))) +
+  geom_point(alpha = 1, shape = 1, size = 0.75)
+```
+
 #### Five Number Summary
 
 In practice we may have many phenotypes to examine, and it is useful to have summaries of each phenotype as well as a summary of how each pair of phenotypes are related. This makes sense if each trait has a roughly symmetric, bell-shaped density, and the scatterplot of pairs of traits have roughly a football shape.
@@ -95,8 +102,8 @@ Correlation measures the spread of data from the SD line, the line through the m
 
 
 ```{r}
-slope <- SDs$hindfoot_length / SDs$weight
-intercept <- means$hindfoot_length - means$weight * slope
+(slope <- SDs$hindfoot_length / SDs$weight)
+(intercept <- means$hindfoot_length - means$weight * slope)
 ```
 
 Here is the SD line plotted over the scatterplot of data. A circle is added at the mean of `weight` and `hindfoot_length`, and a rectangle extends out 2 SDs in each direction. The data points are made a bit smaller and grayer to deempathize them.
@@ -211,6 +218,13 @@ surveys_plot +
   geom_smooth(method = "lm", se = FALSE)
 ```
 
+```{r}
+surveys_plot + 
+  geom_point(alpha = 1, shape = 1) +
+  geom_abline(intercept=intercept, slope=slope,
+              col="red", lwd=1) +
+  geom_smooth(method = "lm", se = FALSE)
+```
 We say that we "regress `hindfoot_length` on `weight`". This is sometimes called "simple linear regression", because the right side of this formula can get a lot more complicated (in later lessons). We introduce this concept here to make the bridge to the next lesson on covariates, and to connect correlation to linear models.
 
 Simple linear regression is a special kind of "linear model". The linear model function `lm()` provides another tool to test correlation, with more flexibility than `cor.test()`. `lm` has more bells and whistles and `lm` can handle more complicated relationships.

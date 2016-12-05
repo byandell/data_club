@@ -318,6 +318,7 @@ Now that you have the numbers, explain the paradox between correlations and slop
 
 <!---
 Interpret table with correlations, slopes and SDs above.
+Refer to rest of Philip Stark's Regression chapter.
 --->
 
 ### Recap
