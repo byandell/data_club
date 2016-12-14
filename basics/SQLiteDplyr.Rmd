@@ -55,7 +55,7 @@ Download the SQLite file `portal_mammals.sqlite` from the [Portal Project Teachi
 It helps to save the name for later use.
 
 ```{r}
-sql_file <- "portal_mammals.sqlite"
+sql_file <- "../data/portal_mammals.sqlite"
 ```
 
 ## Basic queries: 
@@ -297,7 +297,7 @@ There are a host of other dplyr `verbs`. See the references at the top of this d
 You can also use arbitrary SQL directly:
 
 ```{r}
-tbl(sql_connect, sql(
+tbl(sql_connect, build_sql(
   "SELECT species_id, COUNT(surveys.species_id)
    FROM surveys
    GROUP BY species_id

@@ -1,7 +1,7 @@
 bootstrapPage(
   selectInput(inputId = "n_breaks",
               label = "Number of bins in histogram (approximate):",
-              choices = c(10, 20, 35, 50),
+              choices = c(5, 10, 20, 35, 50),
               selected = 20),
   checkboxInput(inputId = "individual_obs",
                 label = strong("Show individual observations"),
